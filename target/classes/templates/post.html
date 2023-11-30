@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Single Post</title>
+    <style>
+        body {
+            color: black;
+            background-color: white;
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        h3, h2 {
+            padding-bottom: 5px;
+        }
+
+        p, label, textarea {
+            padding: 5px;
+            margin: 5px 0;
+        }
+
+        button {
+            background-color: white;
+            color: black;
+            border: 1px solid black;
+            padding: 5px;
+            cursor: pointer;
+        }
+
+        a {
+            color: black;
+            text-decoration: none;
+            border-bottom: 1px dashed black;
+        }
+
+        form {
+            margin-top: 10px;
+        }
+
+        textarea {
+            width: 100%;
+        }
+
+        div[th\\:each="comment : ${commentsList}"], div[th\\:each="tag : ${tags}"] {
+            margin-bottom: 10px;
+        }
+
+        /* Add the border around post.content */
+        #content-wrapper {
+            border: 1px solid black;
+            padding: 10px; /* Adjust the padding as needed */
+            margin-bottom: 20px; /* Add some space at the bottom */
+        }
+    </style>
+</head>
+<body>
+
+<h2 th:text="'Title - ' + ${post.title}"></h2>
+<h4 th:text="'Created-By :'+${post.author}"></h4>
+<p th:text="'Excerpt - ' + ${post.excerpt}"></p>
+
+<!-- Wrap the post.content in a div with an ID for styling -->
+<div id="content-wrapper">
+    <p th:text="${post.content}"></p>
+</div>
+
+<h2>Comments</h2>
+<div th:each="comment : ${commentsList}">
+    <p th:text="'user - ' + ${comment.name}"></p>
+    <p th:text="'Comment - ' + ${comment.comment}"></p>
+
+    <form th:action="@{/editComment}" method= "post">
+        <input type="hidden" name="postId" th:value="${post.id}"/>
+        <input type="hidden" name="commentId" th:value="${comment.id}"/>
+        <button type="submit">Edit comment</button>
+    </form>
+    <form th:action="@{'/deleteComment/' + ${comment.id}}" method="post">
+        <input type="hidden" name="postId" th:value="${post.id}"/>
+        <button type="submit">Delete Comment</button>
+    </form>
+</div>
+
+<h3>Tags:</h3>
+<div th:each="tag : ${tags}">
+    <a th:text="${tag.name}"></a>
+</div>
+
+<h3>Add a new Comment </h3>
+<!-- Add more fields as needed -->
+<form th:action="@{/comment/{postId}(postId=${post.id})}" th:object="${newComment}" method="post">
+    <label for="name">Your Name:</label>
+    <input type="text" id="name" name="name" required/><br/>
+    <label for="comment">Your Comment:</label>
+
+    <textarea id="comment" name="comment" required></textarea><br/>
+    <button type="submit">Add Comment</button>
+</form>
+
+<form th:action="@{'/delete/' + ${post.id}}" method="post">
+    <button type="submit">Delete Post</button>
+</form>
+<a th:href="@{'/update/' + ${post.id}}">Update Post</a>
+
+<form th:action="@{/goToHomepage}" method="post">
+    <button type="submit">Home</button>
+</form>
+</body>
+</html>

@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>HomePage</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #fff;
+            margin: 0;
+            padding: 0;
+            color: #000;
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        form {
+            margin-bottom: 20px;
+        }
+
+        select, button, input[type="text"] {
+            padding: 10px;
+            margin-bottom: 10px;
+            box-sizing: border-box;
+            border: 1px solid #000;
+            border-radius: 4px;
+        }
+
+        select {
+            width: 20%;
+        }
+
+        button {
+            background-color: #000;
+            color: #fff;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #333;
+        }
+
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+        }
+
+        .homePage {
+            width: 48%;
+            margin-bottom: 20px;
+            border: 1px solid #000;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+
+        .homePage a {
+            text-decoration: none;
+            color: #000;
+        }
+
+        .homePage p {
+            margin: 10px 0;
+        }
+
+        .pagination {
+            margin-top: 20px;
+            clear: both;
+        }
+
+        .pagination a {
+            padding: 10px;
+            margin-right: 5px;
+            background-color: #000;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 4px;
+        }
+
+        .pagination a:hover {
+            background-color: #333;
+        }
+        .post-content{
+        max-height: 3.5em;
+        overflow: hidden;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Home Page</h1>
+<div sec:authorize="isAuthenticated()">
+    <h3 th:text="'Welcome : '+ ${user.name}"></h3>
+    <form th:action="@{/logout}" method="post">
+        <button type="submit">Logout</button>
+    </form>
+</div>
+<div sec:authorize="!isAuthenticated()">
+    <form th:action="@{/showMyLoginPage}" method="get">
+        <button type="submit">Login</button>
+    </form>
+    <form th:action="@{/register}" method="get">
+        <button type="submit">Register</button>
+    </form>
+</div>
+<div>
+<h3><b>Apply Filters</b></h3>
+
+
+
+
+
+<form th:action="@{/}" method="get">
+    <select name="authors" multiple="multiple">
+        <option th:each="author : ${authors}" th:value="${author}" th:text="${author}"></option>
+    </select>
+    <span> <select name="tags" multiple="multiple">
+        <option th:each="tag : ${tags}" th:value="${tag.id}" th:text="${tag.name}"></option>
+    </select></span>
+    <br>
+    <button type="submit">Filter</button>
+</form>
+
+<a th:href="@{'/?pageNo=' + ${currentPage} + '&sortField=createdAt&sortOrder=desc'}">Sort</a> <br>
+
+<form th:action="@{/}" method="get">
+    <input type="text" name="searchTerm" placeholder="Search..." />
+    <button type="submit">Search</button>
+</form>
+
+<form th:action="@{/newPost}" method="get">
+    <button type="submit">Create New Blog</button>
+</form>
+<div class="container">
+    <div th:each="post : ${posts}" class="homePage">
+        <a th:href="@{/posts/{postId}(postId=${post.id})}">
+            <h3><p th:text="${post.title}"></p></h3>
+        </a>
+        <p th:text="${post.createdAt}"></p>
+        <p th:text="${post.excerpt}"></p>
+        <p th:text="${post.content}" th:class="'post-content'"></p>
+    </div>
+</div>
+
+<div class="pagination">
+    <a th:if="${currentPage > 0}" th:href="@{'/?pageNo=' + ${currentPage - 1}+'&sortField=' +
+${sortField}+'&sortOrder=' + ${sortOrder}}">Previous</a>
+    <a th:if="${currentPage < totalPages - 1}" th:href="@{'/?pageNo=' + ${currentPage + 1}+'&sortField=' +
+ ${sortField}+'&sortOrder=' + ${sortOrder}}">Next</a>
+</div>
+
+</body>
+</html>
